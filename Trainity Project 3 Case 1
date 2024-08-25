@@ -2,7 +2,7 @@
 Task (1): Number of jobs reviewed: Amount of jobs reviewed over time.
 Calculate the number of jobs reviewed per hour per day for November 2020?
 */
-use job_data;
+use project3;
 SELECT 
     *
 FROM
@@ -44,33 +44,20 @@ Task (3) : Percentage share of each language: Share of each language for differe
 Calculate the percentage share of each language?
 */
 SELECT 
-    job_data.job_id,
     job_data.language,
     COUNT(job_data.language) AS total_of_each_language,
-    ((COUNT(job_data.language) / (SELECT 
+    (COUNT(job_data.language) * 100.0 / (SELECT 
             COUNT(*)
         FROM
-            job_data)) * 100) AS percentage_share_of_each_language
+            job_data)) AS percentage_share_of_each_language
 FROM
     job_data
-GROUP BY job_data.language
+GROUP BY job_data.language;
 
--- percentage of share of distinct language 
-SELECT 
-    job_data.job_id,
-    job_data.language,
-    COUNT(DISTINCT job_data.language) AS total_of_each_language,
-    ((COUNT(job_data.language) / (SELECT 
-            COUNT(*)
-        FROM
-            job_data)) * 100) AS percentage_share_of_each_distinct_language
-FROM
-    job_data
-GROUP BY job_data.language
 
 /*
-Task (D) : Duplicate rows: Rows that have the same value present in them.
-Your task: Let’s say you see some duplicate rows in the data. How will you display duplicates from the table?
+Task (4) : Duplicate rows: Rows that have the same value present in them.
+Display duplicates from the table.
 */
 
 SELECT * FROM 
