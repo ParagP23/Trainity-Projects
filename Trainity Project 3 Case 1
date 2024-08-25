@@ -1,0 +1,79 @@
+/* Case 1 : 
+Task (1): Number of jobs reviewed: Amount of jobs reviewed over time.
+Calculate the number of jobs reviewed per hour per day for November 2020?
+*/
+use job_data;
+SELECT 
+    *
+FROM
+    job_data;
+
+-- non_distinct jobs reviewed per day
+SELECT 
+    COUNT(job_id) / (30 * 24) AS number_of_jobs_reviewed_per_day_non_distinct
+FROM
+    job_data;
+
+-- distinct jobs reviewed per day
+SELECT 
+    COUNT(DISTINCT job_id) / (30 * 24) AS number_of_jobs_reviewed_per_day_distinct
+FROM
+    job_data;
+/*
+Task (2) : Throughput: It is the no. of events happening per second.
+Calculate 7 day rolling average of throughput? For throughput, do you prefer daily metric or 7-day rolling and why?
+*/
+
+-- seven day rolling average of throughput for distinct job_id
+SELECT ds as date_of_review, jobs_reviewed, 
+AVG(jobs_reviewed) 
+OVER(ORDER BY ds ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS throughput_7_rolling_average
+FROM ( SELECT ds, COUNT( DISTINCT job_id) AS jobs_reviewed FROM job_data GROUP BY ds ORDER BY ds ) a;
+
+-- seven day rolling average of throughput for non-distinct job_id
+SELECT ds as date_of_review, jobs_reviewed, 
+AVG(jobs_reviewed) 
+OVER(ORDER BY ds ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS throughput_7_rolling_average_non_distinct_job_id
+FROM ( SELECT ds, COUNT(job_id) AS jobs_reviewed FROM job_data GROUP BY ds ORDER BY ds ) a;
+
+
+
+
+/*
+Task (3) : Percentage share of each language: Share of each language for different contents.
+Calculate the percentage share of each language?
+*/
+SELECT 
+    job_data.job_id,
+    job_data.language,
+    COUNT(job_data.language) AS total_of_each_language,
+    ((COUNT(job_data.language) / (SELECT 
+            COUNT(*)
+        FROM
+            job_data)) * 100) AS percentage_share_of_each_language
+FROM
+    job_data
+GROUP BY job_data.language
+
+-- percentage of share of distinct language 
+SELECT 
+    job_data.job_id,
+    job_data.language,
+    COUNT(DISTINCT job_data.language) AS total_of_each_language,
+    ((COUNT(job_data.language) / (SELECT 
+            COUNT(*)
+        FROM
+            job_data)) * 100) AS percentage_share_of_each_distinct_language
+FROM
+    job_data
+GROUP BY job_data.language
+
+/*
+Task (D) : Duplicate rows: Rows that have the same value present in them.
+Your task: Let’s say you see some duplicate rows in the data. How will you display duplicates from the table?
+*/
+
+SELECT * FROM 
+(SELECT *, ROW_NUMBER()OVER(PARTITION BY job_id) AS row_num
+FROM job_data) a 
+WHERE row_num>1;
